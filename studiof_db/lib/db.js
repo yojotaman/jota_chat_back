@@ -8,7 +8,7 @@ const Promise = require('bluebird')
 const defaults = {
   host: 'localhost',
   port: 28015,
-  db: 'studiof-db'
+  db: 'studiof'
 }
 
 class Db {
@@ -27,6 +27,8 @@ class Db {
       host: this.host,
       port: this.port
     })
+
+    this.connected = true
 
     let db = this.db
     let connection = this.connection
@@ -57,7 +59,20 @@ class Db {
     return Promise.resolve(setup()).asCallback(callback)
     
   }
+  disconnect (callback) {
+    if(!this.connected){
+      return Promise.reject(new Error('not connected')).asCallback(callback)
+    }
+    this.connected = false
+    return Promise.resolve(this.connection)
+      .then((conn) => conn.close())
+  }
 
+  saveImage(image, callback) {
+    if(!this.connected){
+      return Promise.reject(new Error('not connected')).asCallback(callback)
+    }
+  }
 }
 
   module.exports = Db
