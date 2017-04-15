@@ -1,0 +1,29 @@
+{
+  "name": "studiof_db",
+  "version": "1.0.0",
+  "description": "studiof database client",
+  "main": "index.js",
+  "scripts": {
+    "lint": "standard",
+    "test": "ava"
+  },
+  "standard": {
+    "parser": "babel-eslint",
+    "test": "npm run lint | ava"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yojotaman/jota_chat_back.git"
+  },
+  "author": "Jonathan Salazar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yojotaman/jota_chat_back/issues"
+  },
+  "homepage": "https://github.com/yojotaman/jota_chat_back#readme",
+  "devDependencies": {
+    "ava": "^0.19.1",
+    "babel-eslint": "^7.2.2",
+    "standard": "^10.0.2"
+  }
+}
