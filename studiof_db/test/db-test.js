@@ -112,3 +112,22 @@ test('get user', async t => {
   t.deepEqual(created, result)
   // t.throws(db.getUser('foo'), /not found/)
 })
+
+test('authenticate user', async t => {
+  let db = t.context.db
+
+  t.is(typeof db.authenticate, 'function', 'authenticate is a function')
+
+  let user = fixtures.getUser()
+  let plainPassword = user.password
+  await db.saveUser(user)
+
+  let success = await db.authenticate(user.username, plainPassword)
+  t.true(success)
+
+  let fail = await db.authenticate(user.username, 'foo')
+  t.false(fail)
+
+  // let failure = await db.authenticate('foo', 'bar')
+  // t.false(failure)
+})

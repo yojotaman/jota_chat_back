@@ -223,6 +223,31 @@ class Db {
     return Promise.resolve(tasks()).asCallback(callback)
   }
 
+  authenticate (username, password, callback) {
+    if (!this.connected) {
+      return Promise.reject(new Error('not connected')).asCallback(callback)
+    }
+
+    let getUser = this.getUser.bind(this)
+
+    let tasks = co.wrap(function * () {
+      let user = yield getUser(username)
+      // try {
+      //   user = yield getUser(username)
+      // } catch (e) {
+      //   return Promise.resolve(false)
+      // }
+
+      if (user.password === utils.encrypt(password)) {
+        return Promise.resolve(true)
+      }
+
+      return Promise.resolve(false)
+    })
+
+    return Promise.resolve(tasks()).asCallback(callback)
+  }
+
 }
 
   module.exports = Db
