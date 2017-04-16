@@ -46,7 +46,7 @@ class Db {
       let dbTables = yield r.db(db).tableList().run(conn)
       if (dbTables.indexOf('images') === -1) {
         yield r.db(db).tableCreate('images').run(conn)
-        // yield r.db(db).table('images').indexCreate('createdAt').run(conn)
+        yield r.db(db).table('images').indexCreate('createdAt').run(conn)
         // yield r.db(db).table('images').indexCreate('userId', { multi: true }).run(conn)
       }
 
@@ -102,7 +102,78 @@ class Db {
     return Promise.resolve(tasks()).asCallback(callback)
       
   }
+  likeImage (id, callback) {
+    if (!this.connected) {
+      return Promise.reject(new Error('not connected')).asCallback(callback)
+    }
+
+    let connection = this.connection
+    let db = this.db
+    let imageId = uuid.decode(id)
+
+    let tasks = co.wrap(function * () {
+      let conn = yield connection
+
+      let image = yield r.db(db).table('images').get(imageId).run(conn)
+      yield r.db(db).table('images').get(image.id).update({
+        liked: true,
+        likes: image.likes + 1
+      }).run(conn)
+
+      let created = yield r.db(db).table('images').get(imageId).run(conn)
+      return Promise.resolve(created)
+    })
+
+    return Promise.resolve(tasks()).asCallback(callback)
+  }
+
+  getImage (id, callback) {
+    if (!this.connected) {
+      return Promise.reject(new Error('not connected')).asCallback(callback)
+    }
+
+    let connection = this.connection
+    let db = this.db
+    let imageId = uuid.decode(id)
+
+    let tasks = co.wrap(function * () {
+      let conn = yield connection
+      let image = yield r.db(db).table('images').get(imageId).run(conn)
+
+      return Promise.resolve(image)
+    })
+
+    return Promise.resolve(tasks()).asCallback(callback)
+  }
+
+  getImages (callback) {
+    if (!this.connected) {
+      return Promise.reject(new Error('not connected')).asCallback(callback)
+    }
+
+    let connection = this.connection
+    let db = this.db
+
+    let tasks = co.wrap(function * () {
+      let conn = yield connection
+
+      // yield r.db(db).table('images').indexWait().run(conn)
+      let images = yield r.db(db).table('images').orderBy({
+        index: r.desc('createdAt')
+      }).run(conn)
+      let result = yield images.toArray()
+
+      return Promise.resolve(result)
+    })
+
+    return Promise.resolve(tasks()).asCallback(callback)
+  }
+
 }
 
   module.exports = Db
+
+
+
+  
      
