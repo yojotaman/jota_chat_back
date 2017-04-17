@@ -42,9 +42,9 @@ test('save image', async t => {
   t.is(created.likes, image.likes)
   t.is(created.liked, image.liked)
   t.deepEqual(created.tags, [ 'awesome', 'tags', 'studiof' ])
-  t.is(created.user_id, image.user_id)
+  t.is(created.userId, image.userId)
   t.is(typeof created.id, 'string')
-  t.is(created.public_id, uuid.encode(created.id))
+  t.is(created.publicId, uuid.encode(created.id))
   t.truthy(created.createdAt)
 })
 
@@ -54,7 +54,7 @@ test('like image', async t => {
 
   let image = fixtures.getImage()
   let created = await db.saveImage(image)
-  let result = await db.likeImage(created.public_id)
+  let result = await db.likeImage(created.publicId)
 
   t.true(result.liked)
   t.is(result.likes, image.likes + 1)
@@ -66,9 +66,11 @@ test('get image', async t => {
 
   let image = fixtures.getImage()
   let created = await db.saveImage(image)
-  let result = await db.getImage(created.public_id)
+  let result = await db.getImage(created.publicId)
 
   t.deepEqual(created, result)  
+
+  // t.throws(db.getImage('foo'), /not found/) // refactor 
 })
 
 test('list all images', async t => {
@@ -79,8 +81,9 @@ test('list all images', async t => {
   let result = await db.getImages()
 
   t.is(created.length, result.length)
-})
 
+  
+})
 
 test('save user', async t => {
   let db = t.context.db
@@ -99,7 +102,6 @@ test('save user', async t => {
   t.truthy(created.createdAt)
 })
 
-
 test('get user', async t => {
   let db = t.context.db
 
@@ -110,7 +112,7 @@ test('get user', async t => {
   let result = await db.getUser(user.username)
 
   t.deepEqual(created, result)
-  // t.throws(db.getUser('foo'), /not found/)
+  // t.throws(db.getUser('foo'), /not found/) //refactor
 })
 
 test('authenticate user', async t => {
@@ -128,6 +130,56 @@ test('authenticate user', async t => {
   let fail = await db.authenticate(user.username, 'foo')
   t.false(fail)
 
-  // let failure = await db.authenticate('foo', 'bar')
-  // t.false(failure)
+  let failure = await db.authenticate('foo', 'bar')  //refactor
+  t.false(failure)
+})
+
+test('list images by user', async t => {
+  let db = t.context.db
+
+  t.is(typeof db.getImagesByUser, 'function', 'getImagesByUser is a function')
+
+  let images = fixtures.getImages(10)
+  let userId = uuid.uuid()
+  let random = Math.round(Math.random() * images.length)
+
+  let saveImages = []
+  for (let i = 0; i < images.length; i++) {
+    if (i < random) {
+      images[i].userId = userId
+    }
+
+    saveImages.push(db.saveImage(images[i]))
+  }
+
+  await Promise.all(saveImages)
+
+  let result = await db.getImagesByUser(userId)
+
+  t.is(result.length, random)
+})
+
+test('list images by tag', async t => {
+  let db = t.context.db
+
+  t.is(typeof db.getImagesByTag, 'function', 'getImagesByTag is a function')
+
+  let images = fixtures.getImages(10)
+  let tag = '#filterit'
+  let random = Math.round(Math.random() * images.length)
+
+  let saveImages = []
+  for (let i = 0; i < images.length; i++) {
+    if (i < random) {
+      images[i].description = tag
+    }
+
+    saveImages.push(db.saveImage(images[i]))
+  }
+
+  await Promise.all(saveImages)
+
+  let result = await db.getImagesByTag(tag)
+
+  t.is(result.length, random)
 })
