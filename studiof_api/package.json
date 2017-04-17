@@ -1,0 +1,36 @@
+{
+  "name": "studiof_api",
+  "version": "1.0.0",
+  "description": "studiof REST API",
+  "main": "index.js",
+  "scripts": {
+    "lint": "standard",
+    "test": "npm run lint | ava"
+  },
+  "standard": {
+    "parser": "babel-eslint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yojotaman/jota_chat_back.git"
+  },
+  "author": "Jonathan Salazar",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yojotaman/jota_chat_back/issues"
+  },
+  "homepage": "https://github.com/yojotaman/jota_chat_back#readme",
+  "devDependencies": {
+    "ava": "^0.19.1",
+    "babel-eslint": "^7.2.2",
+    "standard": "^10.0.2",
+    "test-listen": "^1.0.0"
+  },
+  "dependencies": {
+    "babel-runtime": "^6.23.0",
+    "micro": "^7.3.2",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.0",
+    "uuid-base62": "^0.1.0"
+  }
+}
