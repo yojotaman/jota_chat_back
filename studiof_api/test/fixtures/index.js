@@ -24,18 +24,15 @@ export default {
       this.getImage(),
       this.getImage()
     ]
+  },
+  getUser () {
+    return {
+      id: 'f632db90-d6bf-46f0-9fb1-4eb6912cbdb4', // generado con el módulo de uuid
+      name: 'Ricardo Buitrago', // usuario de prueba
+      username: 'w_martinez',
+      email: 'w_martinez@studiof.test',
+      password: 'p4ssw0rd',
+      createdAt: new Date().toString()
+    }
   }
 }
-
-//   ,
-
-//   getUser () {
-//     return {
-//       id: 'f632db90-d6bf-46f0-9fb1-4eb6912cbdb4',
-//       name: 'Freddy Vega',
-//       username: 'freddier',
-//       email: 'f@platzi.test',
-//       password: 'pl4tzi',
-//       createdAt: new Date().toString()
-//     }
-//   }
