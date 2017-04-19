@@ -39,6 +39,29 @@ test('no token POST /', async t => {
   return t.throws(request(options), /invalid token/) // fue necesario añadir la palabra return para que l test funcionara
 })
 
+test('invalid token POST /', async t => {
+  let image = fixtures.getImage()
+  let url = t.context.url
+  let token = await utils.signToken({ userId: 'hacky' }, config.secret)
+
+  let options = {
+    method: 'POST',
+    uri: url,
+    json: true,
+    body: {
+      description: image.description,
+      src: image.src,
+      userId: image.userId
+    },
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },
+    resolveWithFullResponse: true
+  }
+
+  return t.throws(request(options), /invalid token/)
+})
+
 test('secure POST /', async t => {
   let image = fixtures.getImage()
   let url = t.context.url
