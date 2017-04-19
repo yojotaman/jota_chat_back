@@ -6,6 +6,8 @@ import listen from 'test-listen'
 import request from 'request-promise'
 import fixtures from './fixtures'
 import pictures from '../pictures'
+import utils from '../lib/utils'
+import config from '../config'
 
 test.beforeEach(async t => {
   let srv = micro(pictures)
@@ -19,7 +21,7 @@ test('GET /:id', async t => {
   t.deepEqual(body, image)
 })
 
-test('POST /', async t => {
+test('no token POST /', async t => {
   let image = fixtures.getImage()
   let url = t.context.url
 
@@ -34,8 +36,31 @@ test('POST /', async t => {
     },
     resolveWithFullResponse: true
   }
+  return t.throws(request(options), /invalid token/) // fue necesario añadir la palabra return para que l test funcionara
+})
+
+test('secure POST /', async t => {
+  let image = fixtures.getImage()
+  let url = t.context.url
+  let token = await utils.signToken({ userId: image.userId }, config.secret)
+
+  let options = {
+    method: 'POST',
+    uri: url,
+    json: true,
+    body: {
+      description: image.description,
+      src: image.src,
+      userId: image.userId
+    },
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },
+    resolveWithFullResponse: true
+  }
 
   let response = await request(options)
+
   t.is(response.statusCode, 201)
   t.deepEqual(response.body, image)
 })

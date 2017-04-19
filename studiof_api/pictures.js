@@ -4,6 +4,7 @@ import { send, json } from 'micro'
 import HttpHash from 'http-hash'
 import Db from 'studiof_db'
 import config from './config'
+import utils from './lib/utils'
 import DbStub from './test/stub/db'
 
 const env = process.env.NODE_ENV || 'production'
@@ -40,6 +41,14 @@ hash.set('GET /:id', async function getPicture (req, res, params) {
 
 hash.set('POST /', async function postPicture (req, res, params) {
   let image = await json(req)
+
+  try {
+    let token = await utils.extractToken(req)
+    await utils.verifyToken(token, config.secret)
+  } catch (e) {
+    return send(res, 401, { error: 'invalid token' })
+  }
+
   await db.connect()
   let created = await db.saveImage(image)
   await db.disconnect()
